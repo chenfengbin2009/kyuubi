@@ -26,6 +26,7 @@ import org.apache.thrift.TException
 import org.apache.thrift.transport.TTransportException
 
 import org.apache.kyuubi.{KyuubiSQLException, Utils}
+import org.apache.kyuubi.config.KyuubiConf
 import org.apache.kyuubi.config.KyuubiReservedKeys.KYUUBI_OPERATION_HANDLE_KEY
 import org.apache.kyuubi.events.{EventBus, KyuubiOperationEvent}
 import org.apache.kyuubi.metrics.MetricsConstants.{OPERATION_FAIL, OPERATION_OPEN, OPERATION_STATE, OPERATION_TOTAL}
@@ -108,10 +109,15 @@ abstract class KyuubiOperation(session: Session) extends AbstractOperation(sessi
 
   protected def sendCredentialsIfNeeded(): Unit = {
     val appUser = session.asInstanceOf[KyuubiSessionImpl].engine.appUser
+    val engineUser = session.sessionManager.getConf.get(KyuubiConf.ENGINE_SPARK_USER) match {
+      case Some(sparkUser) => sparkUser
+      case _ => appUser
+    }
+
     val sessionManager = session.sessionManager.asInstanceOf[KyuubiSessionManager]
     sessionManager.credentialsManager.sendCredentialsIfNeeded(
       session.handle.identifier.toString,
-      appUser,
+      engineUser,
       client.sendCredentials)
   }
 

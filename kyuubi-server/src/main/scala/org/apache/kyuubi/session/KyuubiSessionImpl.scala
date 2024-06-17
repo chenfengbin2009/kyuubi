@@ -237,7 +237,11 @@ class KyuubiSessionImpl(
 
   private def renewEngineCredentials(): String = {
     try {
-      sessionManager.credentialsManager.renewCredentials(engine.appUser)
+      val appUser = sessionConf.get(KyuubiConf.ENGINE_SPARK_USER) match {
+        case Some(sparkUser) => sparkUser
+        case _ => engine.appUser
+      }
+      sessionManager.credentialsManager.renewCredentials(appUser)
     } catch {
       case e: Exception =>
         error(s"Failed to renew engine credentials for $handle", e)

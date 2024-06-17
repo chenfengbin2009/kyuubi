@@ -136,9 +136,13 @@ class SparkProcessBuilder(
     // if the keytab is specified, PROXY_USER is not supported
     tryKeytab() match {
       case None =>
-        setSparkUserName(proxyUser, buffer)
         buffer += PROXY_USER
-        buffer += proxyUser
+        conf.get(KyuubiConf.ENGINE_SPARK_USER) match {
+          case Some(sparkUser) =>
+            buffer += sparkUser
+          case _ => buffer += proxyUser
+        }
+        setSparkUserName(proxyUser, buffer)
       case Some(name) =>
         setSparkUserName(name, buffer)
     }

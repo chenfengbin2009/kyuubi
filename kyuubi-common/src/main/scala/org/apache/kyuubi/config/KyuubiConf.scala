@@ -2911,6 +2911,13 @@ object KyuubiConf {
       .stringConf
       .createOptional
 
+  val ENGINE_SPARK_USER: OptionalConfigEntry[String] =
+    buildConf("kyuubi.engine.spark.user")
+      .doc("If not empty use this user as spark-submit on yarn user")
+      .version("1.9.x")
+      .stringConf
+      .createOptional
+
   val ENGINE_SPARK_EVENT_LOGGERS: ConfigEntry[Seq[String]] =
     buildConf("kyuubi.engine.spark.event.loggers")
       .doc("A comma-separated list of engine loggers, where engine/session/operation etc" +
